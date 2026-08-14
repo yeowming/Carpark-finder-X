@@ -1,0 +1,1543 @@
+/**
+ * styles.css
+ * 
+ * Geometric Balance Design Theme
+ * 
+ * Aesthetic:
+ * - Crisp geometric structures, mathematical symmetry, and balanced proportions.
+ * - Palette: Deep Slate (#0F172A, #1E293B), Cobalt Blue (#2563EB), Pure Whites (#FFFFFF),
+ *   Subtle Cool Neutrals (#F8FAFC, #F1F5F9, #E2E8F0).
+ * - Typography: Plus Jakarta Sans with JetBrains Mono tabular numeric scales.
+ * - WCAG 2.1 AA compliant contrast ratios throughout.
+ * - Mobile-first layout with responsive breakpoints at 768px and 1024px.
+ * - 44px minimum touch targets for all interactive controls.
+ * 
+ * Lot Availability Color Coding:
+ * - Critical: < 5 lots   -> Rose/Crimson (#DC2626)
+ * - Limited:  < 10 lots  -> Amber/Orange (#D97706)
+ * - Ample:    >= 10 lots -> Emerald (#059669)
+ * - EV:       Charging   -> Electric Blue / Sky (#0284C7)
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@500;600;700&display=swap');
+
+/* ==========================================================================
+   1. Design Tokens & CSS Custom Properties (Geometric Balance)
+   ========================================================================== */
+:root {
+  /* Primary & Accent Color Palette */
+  --geo-primary: #2563EB;
+  --geo-primary-hover: #1D4ED8;
+  --geo-primary-active: #1E40AF;
+  --geo-primary-container: #EFF6FF;
+  --geo-on-primary: #FFFFFF;
+  --geo-on-primary-container: #1E40AF;
+
+  /* Slate & Neutral Surfaces */
+  --geo-slate-950: #020617;
+  --geo-slate-900: #0F172A;
+  --geo-slate-800: #1E293B;
+  --geo-slate-700: #334155;
+  --geo-slate-600: #475569;
+  --geo-slate-500: #64748B;
+  --geo-slate-400: #94A3B8;
+  --geo-slate-300: #CBD5E1;
+  --geo-slate-200: #E2E8F0;
+  --geo-slate-100: #F1F5F9;
+  --geo-slate-50:  #F8FAFC;
+  --geo-surface:    #FFFFFF;
+
+  /* Typography / Text Tokens */
+  --geo-on-surface: #0F172A;
+  --geo-on-surface-variant: #334155;
+  --geo-on-surface-muted: #64748B;
+
+  /* Status Colors (WCAG 2.1 AA Compliant) */
+  --status-red: #DC2626;
+  --status-red-bg: #FEF2F2;
+  --status-red-dark: #991B1B;
+  --status-red-border: #FECACA;
+
+  --status-orange: #D97706;
+  --status-orange-bg: #FFFBEB;
+  --status-orange-dark: #92400E;
+  --status-orange-border: #FDE68A;
+
+  --status-green: #059669;
+  --status-green-bg: #ECFDF5;
+  --status-green-dark: #065F46;
+  --status-green-border: #A7F3D0;
+
+  --status-ev: #0284C7;
+  --status-ev-bg: #F0F9FF;
+  --status-ev-dark: #075985;
+  --status-ev-border: #BAE6FD;
+
+  /* Elevation & Geometric Shadows */
+  --geo-shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
+  --geo-shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.08), 0 1px 2px -1px rgba(15, 23, 42, 0.08);
+  --geo-shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.06);
+  --geo-shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.09), 0 4px 6px -4px rgba(15, 23, 42, 0.05);
+  --geo-shadow-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.12), 0 8px 10px -6px rgba(15, 23, 42, 0.06);
+  --geo-shadow-float: 0 12px 32px -4px rgba(15, 23, 42, 0.15);
+
+  /* Precise Geometric Radii */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* Layout Dimensional Constants */
+  --header-height: 64px;
+  --nav-height: 54px;
+}
+
+/* Backward compatibility mapping with original variables */
+:root {
+  --md-primary: var(--geo-primary);
+  --md-primary-hover: var(--geo-primary-hover);
+  --md-primary-container: var(--geo-primary-container);
+  --md-on-primary: var(--geo-on-primary);
+  --md-on-primary-container: var(--geo-on-primary-container);
+  --md-surface: var(--geo-surface);
+  --md-surface-variant: var(--geo-slate-50);
+  --md-surface-dim: var(--geo-slate-100);
+  --md-background: var(--geo-slate-50);
+  --md-outline: var(--geo-slate-300);
+  --md-outline-variant: var(--geo-slate-200);
+  --md-on-surface: var(--geo-on-surface);
+  --md-on-surface-variant: var(--geo-on-surface-variant);
+  --md-on-surface-muted: var(--geo-on-surface-muted);
+  --elevation-1: var(--geo-shadow-xs);
+  --elevation-2: var(--geo-shadow-sm);
+  --elevation-3: var(--geo-shadow-md);
+  --elevation-4: var(--geo-shadow-lg);
+}
+
+/* ==========================================================================
+   2. Global Reset & Base Typography
+   ========================================================================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--geo-on-surface);
+  background-color: var(--geo-slate-50);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* Screen Reader Utility Class (WCAG 2.1 AA) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Skip Navigation Link */
+.skip-to-content {
+  position: absolute;
+  top: -100px;
+  left: 16px;
+  background: var(--geo-slate-900);
+  color: #FFFFFF;
+  padding: 10px 18px;
+  z-index: 9999;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-decoration: none;
+  border: 1px solid var(--geo-primary);
+  box-shadow: var(--geo-shadow-lg);
+  transition: top 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.skip-to-content:focus {
+  top: 16px;
+  outline: 2px solid var(--geo-primary);
+  outline-offset: 2px;
+}
+
+.is-hidden {
+  display: none !important;
+}
+
+/* ==========================================================================
+   3. Header / Top App Bar (Geometric Header)
+   ========================================================================== */
+.app-header {
+  position: relative;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--header-height);
+  padding: 0 20px;
+  background-color: #FFFFFF;
+  border-bottom: 1px solid var(--geo-slate-200);
+  box-shadow: var(--geo-shadow-xs);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.app-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  background: linear-gradient(135deg, var(--geo-slate-900) 0%, var(--geo-primary) 100%);
+  color: #FFFFFF;
+  border-radius: var(--radius-md);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  flex-shrink: 0;
+}
+
+.logo-icon {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.header-title-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.app-title {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--geo-slate-900);
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.app-subtitle {
+  font-size: 0.75rem;
+  color: var(--geo-slate-500);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.refresh-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background-color: var(--geo-slate-100);
+  border: 1px solid var(--geo-slate-200);
+  border-radius: var(--radius-full);
+  font-size: 0.8125rem;
+  color: var(--geo-slate-700);
+  font-weight: 500;
+  user-select: none;
+}
+
+.refresh-icon {
+  font-size: 17px;
+  color: var(--geo-primary);
+  transition: transform 0.4s ease;
+}
+
+.refresh-icon.is-spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.countdown-label strong {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--geo-primary);
+  font-weight: 700;
+}
+
+/* Icon Buttons (WCAG 44px target) */
+.icon-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background-color: var(--geo-slate-50);
+  border: 1px solid var(--geo-slate-200);
+  border-radius: var(--radius-md);
+  color: var(--geo-slate-700);
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.icon-button:hover, .icon-button:focus-visible {
+  background-color: var(--geo-slate-100);
+  border-color: var(--geo-slate-300);
+  color: var(--geo-slate-900);
+  outline: 2px solid var(--geo-primary);
+  outline-offset: 1px;
+}
+
+.action-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 16px;
+  background-color: var(--geo-slate-900);
+  color: #FFFFFF;
+  border: 1px solid var(--geo-slate-800);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.875rem;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: var(--geo-shadow-xs);
+}
+
+.action-button:hover, .action-button:focus-visible {
+  background-color: var(--geo-primary);
+  border-color: var(--geo-primary);
+  color: #FFFFFF;
+  outline: 2px solid var(--geo-primary);
+  outline-offset: 1px;
+}
+
+.action-button .material-symbols-outlined {
+  font-size: 19px;
+}
+
+#list-count-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   4. Search & Quick Location Navigation Bar
+   ========================================================================== */
+.search-nav-bar {
+  position: relative;
+  z-index: 990;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 20px;
+  background-color: #FFFFFF;
+  border-bottom: 1px solid var(--geo-slate-200);
+}
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.search-icon {
+  position: absolute;
+  left: 14px;
+  color: var(--geo-slate-400);
+  font-size: 20px;
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  height: 44px;
+  padding: 0 42px 0 42px;
+  background-color: var(--geo-slate-50);
+  border: 1px solid var(--geo-slate-200);
+  border-radius: var(--radius-md);
+  font-size: 0.9375rem;
+  color: var(--geo-slate-900);
+  font-weight: 500;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.search-input::placeholder {
+  color: var(--geo-slate-400);
+  font-weight: 400;
+}
+
+.search-input:focus {
+  outline: none;
+  background-color: #FFFFFF;
+  border-color: var(--geo-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.clear-search-btn {
+  position: absolute;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--geo-slate-200);
+  border: none;
+  color: var(--geo-slate-600);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.clear-search-btn:hover {
+  background-color: var(--geo-slate-300);
+  color: var(--geo-slate-900);
+}
+
+.chips-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.chips-container::-webkit-scrollbar {
+  display: none;
+}
+
+.chip-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 14px;
+  background-color: var(--geo-slate-100);
+  border: 1px solid var(--geo-slate-200);
+  border-radius: var(--radius-sm);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--geo-slate-700);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.chip-button:hover, .chip-button:focus-visible {
+  background-color: var(--geo-slate-200);
+  border-color: var(--geo-slate-300);
+  color: var(--geo-slate-900);
+  outline: none;
+}
+
+.chip-button.active {
+  background-color: var(--geo-slate-900);
+  color: #FFFFFF;
+  border-color: var(--geo-slate-900);
+  font-weight: 700;
+  box-shadow: var(--geo-shadow-xs);
+}
+
+.chip-icon {
+  font-size: 16px;
+}
+
+/* ==========================================================================
+   5. Main Viewport & Map Layout
+   ========================================================================== */
+.main-layout {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - var(--header-height) - 104px);
+  display: flex;
+  overflow: hidden;
+  background-color: var(--geo-slate-100);
+}
+
+.map-viewport-section {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  height: 100%;
+}
+
+.map-view {
+  width: 100%;
+  height: 100%;
+  background-color: #E2E8F0;
+  z-index: 1;
+}
+
+/* Floating Recenter FAB */
+.floating-fab {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  background-color: #FFFFFF;
+  color: var(--geo-slate-800);
+  border: 1px solid var(--geo-slate-200);
+  border-radius: var(--radius-md);
+  box-shadow: var(--geo-shadow-md);
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.floating-fab:hover, .floating-fab:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: var(--geo-shadow-lg);
+  color: var(--geo-primary);
+  border-color: var(--geo-primary);
+  outline: 2px solid var(--geo-primary);
+  outline-offset: 1px;
+}
+
+/* Map Loading Overlay */
+.map-overlay {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 850;
+  display: flex;
+  align-items: center;
+  background-color: rgba(15, 23, 42, 0.9);
+  padding: 8px 20px;
+  border-radius: var(--radius-full);
+  box-shadow: var(--geo-shadow-lg);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+}
+
+.spinner-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.material-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: var(--geo-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.spinner-text {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  letter-spacing: -0.01em;
+}
+
+/* ==========================================================================
+   6. Bottom Floating Controls Panel (Geometric Controls)
+   ========================================================================== */
+.bottom-floating-panel {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 950;
+  background-color: #FFFFFF;
+  border-top: 1px solid var(--geo-slate-200);
+  box-shadow: var(--geo-shadow-float);
+  padding: 14px 18px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Legend and Status Strip */
+.panel-legend-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--geo-slate-100);
+}
+
+.legend-items {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: var(--geo-slate-600);
+}
+
+.legend-title {
+  font-weight: 700;
+  color: var(--geo-slate-900);
+  margin-right: 2px;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.legend-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: var(--radius-xs);
+  font-weight: 700;
+  font-size: 0.6875rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: #FFFFFF;
+}
+
+.badge-red {
+  background-color: var(--status-red);
+}
+
+.badge-orange {
+  background-color: var(--status-orange);
+}
+
+.badge-green {
+  background-color: var(--status-green);
+}
+
+.badge-ev {
+  background-color: var(--status-ev);
+  min-width: 20px;
+  padding: 0 3px;
+}
+
+.legend-ev-symbol {
+  font-size: 14px;
+}
+
+.summary-count-badge {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--geo-slate-800);
+  background-color: var(--geo-slate-100);
+  border: 1px solid var(--geo-slate-200);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+}
+
+.summary-count-badge strong {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--geo-primary);
+  font-weight: 700;
+}
+
+/* Controls Grid (Slider & Switch) */
+.controls-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.control-group {
+  background-color: var(--geo-slate-50);
+  border: 1px solid var(--geo-slate-200);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  transition: border-color 0.15s ease;
+}
+
+.control-group:hover {
+  border-color: var(--geo-slate-300);
+}
+
+/* Slider Controls */
+.control-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.control-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--geo-slate-800);
+  cursor: pointer;
+}
+
+.label-icon {
+  font-size: 19px;
+  color: var(--geo-primary);
+}
+
+.highlight-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  color: var(--geo-primary);
+  font-size: 0.9375rem;
+  margin-left: 2px;
+}
+
+.slider-track-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.slider-min-bound, .slider-max-bound {
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--geo-slate-500);
+  min-width: 32px;
+}
+
+.slider-max-bound {
+  text-align: right;
+}
+
+/* Custom Geometric Range Slider */
+.material-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  background: var(--geo-slate-200);
+  border-radius: var(--radius-full);
+  outline: none;
+  cursor: pointer;
+}
+
+.material-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--geo-slate-900);
+  border: 3px solid #FFFFFF;
+  box-shadow: var(--geo-shadow-md);
+  cursor: pointer;
+  transition: transform 0.15s ease, background-color 0.15s;
+}
+
+.material-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  background-color: var(--geo-primary);
+}
+
+.material-slider:focus-visible::-webkit-slider-thumb {
+  outline: 3px solid rgba(37, 99, 235, 0.4);
+}
+
+.material-slider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--geo-slate-900);
+  border: 3px solid #FFFFFF;
+  box-shadow: var(--geo-shadow-md);
+  cursor: pointer;
+}
+
+/* EV Toggle Switch Control */
+.switch-label-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+  min-height: 44px;
+}
+
+.toggle-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background-color: var(--status-ev-bg);
+  color: var(--status-ev-dark);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--status-ev-border);
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.ev-icon {
+  font-size: 20px;
+}
+
+.switch-text-block {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.switch-main-text {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--geo-slate-900);
+  letter-spacing: -0.01em;
+}
+
+.switch-sub-text {
+  font-size: 0.75rem;
+  color: var(--geo-slate-500);
+  font-weight: 500;
+}
+
+/* Material Switch Component */
+.material-switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 28px;
+}
+
+.switch-checkbox {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--geo-slate-300);
+  transition: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: var(--radius-full);
+}
+
+.switch-slider::before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background-color: #FFFFFF;
+  transition: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.2);
+}
+
+.switch-checkbox:checked + .switch-slider {
+  background-color: var(--status-ev);
+}
+
+.switch-checkbox:focus-visible + .switch-slider {
+  outline: 3px solid rgba(2, 132, 199, 0.4);
+}
+
+.switch-checkbox:checked + .switch-slider::before {
+  transform: translateX(20px);
+}
+
+/* ==========================================================================
+   7. Carpark List Drawer / Sidebar
+   ========================================================================== */
+.list-drawer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  max-width: 440px;
+  background-color: #FFFFFF;
+  border-left: 1px solid var(--geo-slate-200);
+  box-shadow: var(--geo-shadow-xl);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.list-drawer:not(.is-closed) {
+  transform: translateX(0);
+}
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--geo-slate-200);
+  background-color: #FFFFFF;
+}
+
+.drawer-title {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--geo-slate-900);
+  letter-spacing: -0.02em;
+}
+
+.drawer-stats {
+  font-size: 0.8125rem;
+  color: var(--geo-slate-500);
+  font-weight: 500;
+}
+
+.summary-strip {
+  display: flex;
+  gap: 6px;
+  padding: 10px 16px;
+  background-color: var(--geo-slate-50);
+  border-bottom: 1px solid var(--geo-slate-200);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.summary-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.summary-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+
+.pill-green {
+  background-color: var(--status-green-bg);
+  color: var(--status-green-dark);
+  border-color: var(--status-green-border);
+}
+
+.pill-orange {
+  background-color: var(--status-orange-bg);
+  color: var(--status-orange-dark);
+  border-color: var(--status-orange-border);
+}
+
+.pill-red {
+  background-color: var(--status-red-bg);
+  color: var(--status-red-dark);
+  border-color: var(--status-red-border);
+}
+
+.pill-ev {
+  background-color: var(--status-ev-bg);
+  color: var(--status-ev-dark);
+  border-color: var(--status-ev-border);
+}
+
+.summary-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.bg-green { background-color: var(--status-green); }
+.bg-orange { background-color: var(--status-orange); }
+.bg-red { background-color: var(--status-red); }
+
+.summary-ev-icon {
+  font-size: 14px;
+}
+
+.cards-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: var(--geo-slate-50);
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--geo-slate-500);
+}
+
+.empty-icon {
+  font-size: 44px;
+  margin-bottom: 12px;
+  color: var(--geo-slate-300);
+}
+
+/* Individual Carpark Card */
+.carpark-card {
+  display: flex;
+  flex-direction: column;
+  background-color: #FFFFFF;
+  border: 1px solid var(--geo-slate-200);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: var(--geo-shadow-xs);
+}
+
+.carpark-card:hover, .carpark-card:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: var(--geo-shadow-md);
+  border-color: var(--geo-primary);
+  outline: none;
+}
+
+.card-top-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.card-dev-name {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--geo-slate-900);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.card-agency-tag {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--geo-slate-600);
+  background-color: var(--geo-slate-100);
+  border: 1px solid var(--geo-slate-200);
+  padding: 2px 6px;
+  border-radius: var(--radius-xs);
+  align-self: flex-start;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.card-middle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
+.card-lots-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: 0.8125rem;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.card-lots-badge.status-red {
+  background-color: var(--status-red-bg);
+  color: var(--status-red-dark);
+  border: 1px solid var(--status-red-border);
+}
+
+.card-lots-badge.status-orange {
+  background-color: var(--status-orange-bg);
+  color: var(--status-orange-dark);
+  border: 1px solid var(--status-orange-border);
+}
+
+.card-lots-badge.status-green {
+  background-color: var(--status-green-bg);
+  color: var(--status-green-dark);
+  border: 1px solid var(--status-green-border);
+}
+
+.card-meta-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: var(--geo-slate-500);
+  font-weight: 600;
+}
+
+.card-ev-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 6px;
+  background-color: var(--status-ev-bg);
+  color: var(--status-ev-dark);
+  border: 1px solid var(--status-ev-border);
+  border-radius: var(--radius-xs);
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   8. Custom Leaflet Map Markers & User Location Pin
+   ========================================================================== */
+.custom-user-marker {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-marker-pulse {
+  position: absolute;
+  width: 38px;
+  height: 38px;
+  background-color: rgba(37, 99, 235, 0.35);
+  border-radius: 50%;
+  animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+
+.user-marker-dot {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  background-color: var(--geo-primary);
+  border: 3px solid #FFFFFF;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.35);
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.5);
+    opacity: 0.8;
+  }
+  80%, 100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+/* Custom Carpark Marker Pin */
+.custom-carpark-pin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 6px;
+  border-radius: var(--radius-sm);
+  border: 2px solid #FFFFFF;
+  box-shadow: var(--geo-shadow-md);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  color: #FFFFFF;
+  cursor: pointer;
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.custom-carpark-pin:hover {
+  transform: scale(1.18);
+  z-index: 1000 !important;
+}
+
+.custom-carpark-pin.pin-red {
+  background-color: var(--status-red);
+}
+
+.custom-carpark-pin.pin-orange {
+  background-color: var(--status-orange);
+}
+
+.custom-carpark-pin.pin-green {
+  background-color: var(--status-green);
+}
+
+.pin-ev-icon {
+  font-size: 14px;
+  margin-right: 2px;
+}
+
+/* Leaflet Popup Styling */
+.leaflet-popup-content-wrapper {
+  border-radius: var(--radius-md);
+  box-shadow: var(--geo-shadow-xl);
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--geo-slate-200);
+}
+
+.leaflet-popup-content {
+  margin: 14px 16px;
+  line-height: 1.4;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.popup-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.popup-title {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--geo-slate-900);
+  letter-spacing: -0.01em;
+}
+
+.popup-lots-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0;
+}
+
+.popup-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  color: #FFFFFF;
+}
+
+.popup-btn-nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 6px;
+  padding: 6px 12px;
+  background-color: var(--geo-slate-900);
+  color: #FFFFFF;
+  border-radius: var(--radius-xs);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.15s;
+}
+
+.popup-btn-nav:hover {
+  background-color: var(--geo-primary);
+}
+
+/* ==========================================================================
+   9. Modal Dialog Styling (Geometric Card)
+   ========================================================================== */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 480px;
+  background-color: #FFFFFF;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--geo-shadow-xl);
+  border: 1px solid var(--geo-slate-200);
+  overflow: hidden;
+  animation: modal-fade-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modal-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--geo-slate-200);
+  background-color: #FFFFFF;
+}
+
+.modal-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.agency-badge {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 2px 8px;
+  background-color: var(--geo-slate-100);
+  color: var(--geo-slate-700);
+  border: 1px solid var(--geo-slate-200);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  border-radius: var(--radius-xs);
+  text-transform: uppercase;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.modal-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--geo-slate-900);
+  letter-spacing: -0.02em;
+}
+
+.modal-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background-color: #FFFFFF;
+}
+
+.modal-lot-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-radius: var(--radius-md);
+}
+
+.modal-lot-banner.status-green {
+  background-color: var(--status-green-bg);
+  border: 1px solid var(--status-green-border);
+  color: var(--status-green-dark);
+}
+
+.modal-lot-banner.status-orange {
+  background-color: var(--status-orange-bg);
+  border: 1px solid var(--status-orange-border);
+  color: var(--status-orange-dark);
+}
+
+.modal-lot-banner.status-red {
+  background-color: var(--status-red-bg);
+  border: 1px solid var(--status-red-border);
+  color: var(--status-red-dark);
+}
+
+.lot-number-group {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.big-number {
+  font-size: 2.25rem;
+  font-weight: 800;
+  font-family: 'JetBrains Mono', monospace;
+  line-height: 1;
+}
+
+.lot-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.status-pill-text {
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+.modal-details-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--geo-slate-100);
+  font-size: 0.875rem;
+}
+
+.detail-row dt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--geo-slate-500);
+  font-weight: 500;
+}
+
+.dt-icon {
+  font-size: 18px;
+  color: var(--geo-primary);
+}
+
+.detail-row dd {
+  font-weight: 600;
+  color: var(--geo-slate-900);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.ev-status-tag {
+  color: var(--status-ev-dark);
+  background-color: var(--status-ev-bg);
+  border: 1px solid var(--status-ev-border);
+  padding: 2px 8px;
+  border-radius: var(--radius-xs);
+  font-weight: 700;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--geo-slate-200);
+  background-color: var(--geo-slate-50);
+}
+
+.btn-text-action {
+  background: transparent;
+  border: 1px solid var(--geo-slate-300);
+  color: var(--geo-slate-700);
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  min-height: 44px;
+  transition: all 0.15s ease;
+}
+
+.btn-text-action:hover {
+  background-color: var(--geo-slate-200);
+  color: var(--geo-slate-900);
+}
+
+.btn-primary-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  background-color: var(--geo-slate-900);
+  color: #FFFFFF;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  text-decoration: none;
+  min-height: 44px;
+  transition: all 0.15s ease;
+  box-shadow: var(--geo-shadow-xs);
+}
+
+.btn-primary-action:hover {
+  background-color: var(--geo-primary);
+  color: #FFFFFF;
+}
+
+/* ==========================================================================
+   10. Responsive Breakpoints (768px & 1024px)
+   ========================================================================== */
+
+/* Tablet Breakpoint: 768px */
+@media (min-width: 768px) {
+  .search-nav-bar {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .search-input-wrapper {
+    max-width: 420px;
+  }
+
+  .controls-grid {
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+  }
+
+  .bottom-floating-panel {
+    max-width: 720px;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 16px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--geo-slate-200);
+    box-shadow: var(--geo-shadow-xl);
+  }
+
+  .main-layout {
+    height: calc(100vh - var(--header-height) - var(--nav-height));
+  }
+}
+
+/* Desktop Breakpoint: 1024px */
+@media (min-width: 1024px) {
+  .bottom-floating-panel {
+    max-width: 820px;
+  }
+
+  .controls-grid {
+    grid-template-columns: 3fr 2fr;
+  }
+
+  .app-title {
+    font-size: 1.25rem;
+  }
+
+  .app-subtitle {
+    font-size: 0.8125rem;
+  }
+}

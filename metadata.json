@@ -1,0 +1,6 @@
+{
+  "name": "SG Carpark & EV Lot Finder",
+  "description": "Real-time Singapore carpark availability and EV charging locator within 1-3km radius with 1-minute auto-refresh and Material Design.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

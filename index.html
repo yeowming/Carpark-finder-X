@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1565C0">
+  <title>SG Carpark & EV Lot Finder | Real-Time Availability</title>
+  <meta name="description" content="Find real-time Singapore carpark availability and EV charging lots within 1km to 3km radius with 1-minute auto-refresh and Material Design.">
+
+  <!-- Google Fonts: Roboto & Material Symbols for Material Design 3 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+
+  <!-- Leaflet Map CSS for responsive interactive mapping (fallback-safe and zero-API-key required) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+
+  <!-- Custom Application Stylesheet -->
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body id="app-body">
+  <!-- Skip Link for Keyboard and Screen Reader Accessibility (WCAG 2.1 AA) -->
+  <a href="#main-content" id="skip-link" class="skip-to-content">Skip to main content</a>
+
+  <!-- ARIA Live Announcement Region for Screen Readers -->
+  <div id="screen-reader-announcer" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Top App Bar / Header -->
+  <header id="top-app-bar" class="app-header" role="banner">
+    <div class="header-left">
+      <div id="app-logo-container" class="app-logo">
+        <span class="material-symbols-outlined logo-icon" aria-hidden="true">local_parking</span>
+      </div>
+      <div class="header-title-group">
+        <h1 id="app-title" class="app-title">SG Carpark &amp; EV Finder</h1>
+        <p id="app-subtitle" class="app-subtitle">Live Singapore LTA &amp; HDB Availability</p>
+      </div>
+    </div>
+
+    <!-- Live 1-Minute Refresh Status & Actions -->
+    <div class="header-right">
+      <div id="refresh-status-badge" class="refresh-badge" title="Auto-refreshes every 60 seconds">
+        <span id="refresh-spinner" class="material-symbols-outlined refresh-icon" aria-hidden="true">sync</span>
+        <span id="countdown-text" class="countdown-label">Auto-refresh in <strong id="countdown-timer">60s</strong></span>
+      </div>
+
+      <button id="btn-manual-refresh" class="icon-button" type="button" aria-label="Refresh carpark data now" title="Refresh carpark data now">
+        <span class="material-symbols-outlined" aria-hidden="true">refresh</span>
+      </button>
+
+      <button id="btn-toggle-list" class="action-button secondary-action" type="button" aria-expanded="false" aria-controls="carparks-list-drawer">
+        <span class="material-symbols-outlined" aria-hidden="true">view_list</span>
+        <span id="list-toggle-label" class="btn-text">List (<span id="list-count-badge">0</span>)</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Location Search & Quick Filter Bar -->
+  <nav id="location-nav-bar" class="search-nav-bar" role="search" aria-label="Location search">
+    <div class="search-input-wrapper">
+      <span class="material-symbols-outlined search-icon" aria-hidden="true">search</span>
+      <input 
+        id="input-location-search" 
+        type="search" 
+        class="search-input" 
+        placeholder="Search Singapore location (e.g. Marina Bay, Orchard, Jurong)..." 
+        aria-label="Search Singapore location or address"
+        autocomplete="off"
+      >
+      <button id="btn-clear-search" class="clear-search-btn is-hidden" type="button" aria-label="Clear search input">
+        <span class="material-symbols-outlined" aria-hidden="true">close</span>
+      </button>
+    </div>
+
+    <!-- Quick Location Chips -->
+    <div id="quick-locations-group" class="chips-container" role="group" aria-label="Popular Singapore locations">
+      <button id="chip-my-location" class="chip-button active" type="button" aria-pressed="true">
+        <span class="material-symbols-outlined chip-icon" aria-hidden="true">my_location</span>
+        <span>My Location</span>
+      </button>
+      <button id="chip-raffles-place" class="chip-button" type="button" data-lat="1.2838" data-lng="103.8515" data-name="Raffles Place">
+        <span>Raffles Place</span>
+      </button>
+      <button id="chip-orchard" class="chip-button" type="button" data-lat="1.3048" data-lng="103.8318" data-name="Orchard Road">
+        <span>Orchard</span>
+      </button>
+      <button id="chip-marina-bay" class="chip-button" type="button" data-lat="1.2834" data-lng="103.8607" data-name="Marina Bay Sands">
+        <span>Marina Bay</span>
+      </button>
+      <button id="chip-jurong" class="chip-button" type="button" data-lat="1.3331" data-lng="103.7423" data-name="Jurong Gateway">
+        <span>Jurong East</span>
+      </button>
+      <button id="chip-tampines" class="chip-button" type="button" data-lat="1.3532" data-lng="103.9452" data-name="Tampines Central">
+        <span>Tampines</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Content Layout -->
+  <main id="main-content" class="main-layout" role="main">
+    
+    <!-- Map Container Section -->
+    <section id="map-section" class="map-viewport-section" aria-label="Interactive Carpark Map">
+      <!-- Leaflet Map Mount Point -->
+      <div id="map-container" class="map-view"></div>
+
+      <!-- Quick Location Reset Button Floating on Map -->
+      <button id="btn-recenter-map" class="floating-fab" type="button" aria-label="Recenter map on active location" title="Recenter map">
+        <span class="material-symbols-outlined" aria-hidden="true">gps_fixed</span>
+      </button>
+
+      <!-- Map Loading / Fetching Overlay Spinner -->
+      <div id="map-loading-overlay" class="map-overlay is-hidden" aria-hidden="true">
+        <div class="spinner-container">
+          <div class="material-spinner"></div>
+          <p id="loading-overlay-text" class="spinner-text">Updating real-time lots...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Side / Slide-out Carpark List Drawer -->
+    <aside id="carparks-list-drawer" class="list-drawer is-closed" aria-label="Carparks List" aria-hidden="true">
+      <div class="drawer-header">
+        <div class="drawer-header-text">
+          <h2 id="drawer-title" class="drawer-title">Nearby Carparks</h2>
+          <p id="drawer-stats" class="drawer-stats">Showing 0 carparks within 1.5 km</p>
+        </div>
+        <button id="btn-close-drawer" class="icon-button" type="button" aria-label="Close carparks list">
+          <span class="material-symbols-outlined" aria-hidden="true">close</span>
+        </button>
+      </div>
+
+      <!-- Summary Metric Strip -->
+      <div id="drawer-summary-strip" class="summary-strip" role="region" aria-label="Availability Summary">
+        <div class="summary-pill pill-green">
+          <span class="summary-dot bg-green" aria-hidden="true"></span>
+          <span id="stat-green-count">0</span> Ample (&ge;10)
+        </div>
+        <div class="summary-pill pill-orange">
+          <span class="summary-dot bg-orange" aria-hidden="true"></span>
+          <span id="stat-orange-count">0</span> Limited (&lt;10)
+        </div>
+        <div class="summary-pill pill-red">
+          <span class="summary-dot bg-red" aria-hidden="true"></span>
+          <span id="stat-red-count">0</span> Critical (&lt;5)
+        </div>
+        <div class="summary-pill pill-ev">
+          <span class="material-symbols-outlined summary-ev-icon" aria-hidden="true">electric_bolt</span>
+          <span id="stat-ev-count">0</span> EV Ready
+        </div>
+      </div>
+
+      <!-- Scrollable List of Carpark Cards -->
+      <div id="carparks-list-container" class="cards-list" role="list" aria-label="Carpark list items">
+        <div class="empty-state">
+          <span class="material-symbols-outlined empty-icon" aria-hidden="true">local_parking</span>
+          <p>No carparks loaded yet. Searching nearby area...</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Bottom Controls Panel (Slider & EV Toggle) -->
+    <section id="bottom-controls-panel" class="bottom-floating-panel" aria-label="Radius and EV Filter Controls">
+      
+      <!-- Panel Header & Color Legend Bar -->
+      <div class="panel-legend-bar">
+        <div class="legend-items">
+          <span class="legend-title">Lot Status:</span>
+          <span class="legend-item"><span class="legend-badge badge-red" aria-hidden="true">&lt; 5</span> Critical</span>
+          <span class="legend-item"><span class="legend-badge badge-orange" aria-hidden="true">&lt; 10</span> Limited</span>
+          <span class="legend-item"><span class="legend-badge badge-green" aria-hidden="true">&gt; 10</span> Available</span>
+          <span class="legend-item"><span class="legend-badge badge-ev" aria-hidden="true"><span class="material-symbols-outlined legend-ev-symbol">electric_bolt</span></span> EV</span>
+        </div>
+        <div id="summary-lot-count" class="summary-count-badge">
+          <strong id="lots-total-number">0</strong> carparks found
+        </div>
+      </div>
+
+      <!-- Main Controls Row: Slider + EV Switch -->
+      <div class="controls-grid">
+        
+        <!-- Radius Slider Control Group (1km to 3km) -->
+        <div id="radius-control-group" class="control-group slider-group">
+          <div class="control-label-row">
+            <label for="input-radius-slider" id="radius-slider-label" class="control-label">
+              <span class="material-symbols-outlined label-icon" aria-hidden="true">radar</span>
+              <span>Search Radius:</span>
+              <strong id="radius-value-display" class="highlight-text">1.5 km</strong>
+            </label>
+          </div>
+          
+          <div class="slider-track-container">
+            <span class="slider-min-bound" aria-hidden="true">1 km</span>
+            <input 
+              id="input-radius-slider" 
+              type="range" 
+              min="1.0" 
+              max="3.0" 
+              step="0.1" 
+              value="1.5" 
+              class="material-slider"
+              aria-labelledby="radius-slider-label"
+              aria-valuemin="1.0"
+              aria-valuemax="3.0"
+              aria-valuenow="1.5"
+              aria-valuetext="1.5 kilometers search radius"
+            >
+            <span class="slider-max-bound" aria-hidden="true">3 km</span>
+          </div>
+        </div>
+
+        <!-- EV Charging Toggle Filter Group -->
+        <div id="ev-filter-group" class="control-group toggle-group">
+          <label for="toggle-ev-charging" class="switch-label-wrapper">
+            <span class="toggle-icon-wrap">
+              <span class="material-symbols-outlined ev-icon" aria-hidden="true">bolt</span>
+            </span>
+            <span class="switch-text-block">
+              <span class="switch-main-text">EV Charging Only</span>
+              <span class="switch-sub-text">Filter charging lots</span>
+            </span>
+            <div class="material-switch">
+              <input 
+                id="toggle-ev-charging" 
+                type="checkbox" 
+                class="switch-checkbox" 
+                role="switch" 
+                aria-checked="false"
+              >
+              <span class="switch-slider" aria-hidden="true"></span>
+            </div>
+          </label>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Carpark Detail Modal / Dialog -->
+  <div id="carpark-detail-modal" class="modal-backdrop is-hidden" role="dialog" aria-modal="true" aria-labelledby="modal-carpark-name">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span id="modal-agency-badge" class="agency-badge">LTA</span>
+          <h3 id="modal-carpark-name" class="modal-title">Development Name</h3>
+        </div>
+        <button id="btn-close-modal" class="icon-button" type="button" aria-label="Close details dialog">
+          <span class="material-symbols-outlined" aria-hidden="true">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Big Availability Pill -->
+        <div id="modal-lot-banner" class="modal-lot-banner status-green">
+          <div class="lot-number-group">
+            <span id="modal-available-lots" class="big-number">45</span>
+            <span class="lot-label">Available Lots</span>
+          </div>
+          <div id="modal-status-text" class="status-pill-text">Available (&ge; 10 lots)</div>
+        </div>
+
+        <!-- Detail Attributes List -->
+        <dl class="modal-details-grid">
+          <div class="detail-row">
+            <dt><span class="material-symbols-outlined dt-icon" aria-hidden="true">location_on</span> Distance:</dt>
+            <dd id="modal-distance-val">0.45 km away</dd>
+          </div>
+          <div class="detail-row">
+            <dt><span class="material-symbols-outlined dt-icon" aria-hidden="true">directions_car</span> Vehicle Type:</dt>
+            <dd id="modal-vehicle-val">Car (Lot Type C)</dd>
+          </div>
+          <div class="detail-row">
+            <dt><span class="material-symbols-outlined dt-icon" aria-hidden="true">ev_station</span> EV Charging:</dt>
+            <dd id="modal-ev-val"><span class="ev-status-tag">Available on-site</span></dd>
+          </div>
+          <div class="detail-row">
+            <dt><span class="material-symbols-outlined dt-icon" aria-hidden="true">tag</span> Carpark Code:</dt>
+            <dd id="modal-code-val">#123</dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="modal-footer">
+        <button id="btn-modal-close-action" class="btn-text-action" type="button">Close</button>
+        <a id="btn-modal-navigate" href="#" target="_blank" rel="noopener noreferrer" class="btn-primary-action">
+          <span class="material-symbols-outlined" aria-hidden="true">directions</span>
+          <span>Get Directions</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaflet JavaScript library -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  
+  <!-- Main Vanilla JavaScript Application Script -->
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -494,8 +494,11 @@ function updateSummaryBadges(summary) {
   const orangeEl = document.getElementById("stat-orange-count");
   const redEl = document.getElementById("stat-red-count");
   const evEl = document.getElementById("stat-ev-count");
+  const collapsedTotalEl = document.getElementById("collapsed-lots-total");
 
-  if (totalEl) totalEl.textContent = summary.totalFound || 0;
+  const totalFound = summary.totalFound || 0;
+  if (totalEl) totalEl.textContent = totalFound;
+  if (collapsedTotalEl) collapsedTotalEl.textContent = totalFound;
   if (greenEl) greenEl.textContent = summary.greenCount || 0;
   if (orangeEl) orangeEl.textContent = summary.orangeCount || 0;
   if (redEl) redEl.textContent = summary.redCount || 0;
@@ -650,6 +653,7 @@ function setupEventListeners() {
   // 1. Radius Slider Event Listener (1km to 3km)
   const radiusSlider = document.getElementById("input-radius-slider");
   const radiusDisplay = document.getElementById("radius-value-display");
+  const collapsedRadiusVal = document.getElementById("collapsed-radius-val");
 
   if (radiusSlider) {
     radiusSlider.addEventListener("input", (e) => {
@@ -659,6 +663,9 @@ function setupEventListeners() {
       // Update text label immediately for instant UI feedback
       if (radiusDisplay) {
         radiusDisplay.textContent = `${newRadius.toFixed(1)} km`;
+      }
+      if (collapsedRadiusVal) {
+        collapsedRadiusVal.textContent = newRadius.toFixed(1);
       }
       
       // Update radius circle boundary on map
@@ -675,12 +682,45 @@ function setupEventListeners() {
 
   // 2. EV Charging Toggle Filter Switch
   const evToggle = document.getElementById("toggle-ev-charging");
+  const collapsedEvBadge = document.getElementById("collapsed-ev-badge");
   if (evToggle) {
     evToggle.addEventListener("change", (e) => {
       appState.evOnlyFilter = e.target.checked;
       evToggle.setAttribute("aria-checked", appState.evOnlyFilter ? "true" : "false");
+      if (collapsedEvBadge) {
+        if (appState.evOnlyFilter) {
+          collapsedEvBadge.classList.remove("is-hidden");
+        } else {
+          collapsedEvBadge.classList.add("is-hidden");
+        }
+      }
       announceAccessibilityMessage(`EV charging filter ${appState.evOnlyFilter ? "enabled" : "disabled"}.`);
       fetchNearbyCarparks();
+    });
+  }
+
+  // 2b. Minimize and Expand Bottom Panel Buttons
+  const bottomPanel = document.getElementById("bottom-controls-panel");
+  const panelFullContent = document.getElementById("panel-full-content");
+  const panelCollapsedView = document.getElementById("panel-collapsed-view");
+  const btnMinimizePanel = document.getElementById("btn-minimize-panel");
+  const btnExpandPanel = document.getElementById("btn-expand-panel");
+
+  if (btnMinimizePanel && bottomPanel && panelFullContent && panelCollapsedView) {
+    btnMinimizePanel.addEventListener("click", () => {
+      bottomPanel.classList.add("is-minimized");
+      panelFullContent.classList.add("is-hidden");
+      panelCollapsedView.classList.remove("is-hidden");
+      announceAccessibilityMessage("Controls panel minimized to micro view.");
+    });
+  }
+
+  if (btnExpandPanel && bottomPanel && panelFullContent && panelCollapsedView) {
+    btnExpandPanel.addEventListener("click", () => {
+      bottomPanel.classList.remove("is-minimized");
+      panelCollapsedView.classList.add("is-hidden");
+      panelFullContent.classList.remove("is-hidden");
+      announceAccessibilityMessage("Controls panel expanded.");
     });
   }
 

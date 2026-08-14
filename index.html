@@ -159,79 +159,99 @@
       </div>
     </aside>
 
-    <!-- Bottom Controls Panel (Slider & EV Toggle) -->
+    <!-- Bottom Controls Panel (Minimized Low-Obstruction Floating Bar) -->
     <section id="bottom-controls-panel" class="bottom-floating-panel" aria-label="Radius and EV Filter Controls">
       
-      <!-- Panel Header & Color Legend Bar -->
-      <div class="panel-legend-bar">
-        <div class="legend-items">
-          <span class="legend-title">Lot Status:</span>
-          <span class="legend-item"><span class="legend-badge badge-red" aria-hidden="true">&lt; 5</span> Critical</span>
-          <span class="legend-item"><span class="legend-badge badge-orange" aria-hidden="true">&lt; 10</span> Limited</span>
-          <span class="legend-item"><span class="legend-badge badge-green" aria-hidden="true">&gt; 10</span> Available</span>
-          <span class="legend-item"><span class="legend-badge badge-ev" aria-hidden="true"><span class="material-symbols-outlined legend-ev-symbol">electric_bolt</span></span> EV</span>
+      <!-- Collapsed Micro-Pill Preview (shown when minimized) -->
+      <div id="panel-collapsed-view" class="panel-collapsed-view is-hidden">
+        <div class="collapsed-info-group">
+          <span class="collapsed-badge-dot"></span>
+          <span class="collapsed-radius-text"><strong id="collapsed-radius-val">1.5</strong> km</span>
+          <span class="collapsed-divider" aria-hidden="true">·</span>
+          <span id="collapsed-ev-badge" class="collapsed-ev-text is-hidden"><span class="material-symbols-outlined micro-icon">bolt</span> EV</span>
+          <span class="collapsed-count-text"><strong id="collapsed-lots-total">0</strong> lots</span>
         </div>
-        <div id="summary-lot-count" class="summary-count-badge">
-          <strong id="lots-total-number">0</strong> carparks found
-        </div>
+        <button id="btn-expand-panel" class="panel-expand-btn" type="button" aria-label="Expand filter controls">
+          <span class="material-symbols-outlined">tune</span>
+          <span>Controls</span>
+        </button>
       </div>
 
-      <!-- Main Controls Row: Slider + EV Switch -->
-      <div class="controls-grid">
-        
-        <!-- Radius Slider Control Group (1km to 3km) -->
-        <div id="radius-control-group" class="control-group slider-group">
-          <div class="control-label-row">
+      <!-- Full Controls Container -->
+      <div id="panel-full-content" class="panel-full-content">
+        <!-- Top Compact Legend & Status Row -->
+        <div class="panel-legend-bar">
+          <div class="legend-items" aria-label="Lot availability color guide">
+            <span class="legend-item"><span class="legend-dot dot-red" aria-hidden="true"></span>&lt;5</span>
+            <span class="legend-item"><span class="legend-dot dot-orange" aria-hidden="true"></span>&lt;10</span>
+            <span class="legend-item"><span class="legend-dot dot-green" aria-hidden="true"></span>&ge;10</span>
+            <span class="legend-item"><span class="material-symbols-outlined legend-ev-symbol" aria-hidden="true">bolt</span>EV</span>
+          </div>
+          <div class="legend-right-actions">
+            <div id="summary-lot-count" class="summary-count-badge">
+              <strong id="lots-total-number">0</strong> carparks
+            </div>
+            <button id="btn-minimize-panel" class="panel-minimize-btn" type="button" aria-label="Minimize controls panel" title="Minimize controls to see more map">
+              <span class="material-symbols-outlined" aria-hidden="true">keyboard_arrow_down</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Inline Controls Row: Slider & EV Switch -->
+        <div class="controls-grid">
+          
+          <!-- Compact Radius Slider (1km to 3km) -->
+          <div id="radius-control-group" class="control-group slider-group">
             <label for="input-radius-slider" id="radius-slider-label" class="control-label">
               <span class="material-symbols-outlined label-icon" aria-hidden="true">radar</span>
-              <span>Search Radius:</span>
+              <span class="label-text">Radius:</span>
               <strong id="radius-value-display" class="highlight-text">1.5 km</strong>
             </label>
-          </div>
-          
-          <div class="slider-track-container">
-            <span class="slider-min-bound" aria-hidden="true">1 km</span>
-            <input 
-              id="input-radius-slider" 
-              type="range" 
-              min="1.0" 
-              max="3.0" 
-              step="0.1" 
-              value="1.5" 
-              class="material-slider"
-              aria-labelledby="radius-slider-label"
-              aria-valuemin="1.0"
-              aria-valuemax="3.0"
-              aria-valuenow="1.5"
-              aria-valuetext="1.5 kilometers search radius"
-            >
-            <span class="slider-max-bound" aria-hidden="true">3 km</span>
-          </div>
-        </div>
-
-        <!-- EV Charging Toggle Filter Group -->
-        <div id="ev-filter-group" class="control-group toggle-group">
-          <label for="toggle-ev-charging" class="switch-label-wrapper">
-            <span class="toggle-icon-wrap">
-              <span class="material-symbols-outlined ev-icon" aria-hidden="true">bolt</span>
-            </span>
-            <span class="switch-text-block">
-              <span class="switch-main-text">EV Charging Only</span>
-              <span class="switch-sub-text">Filter charging lots</span>
-            </span>
-            <div class="material-switch">
+            
+            <div class="slider-track-container">
+              <span class="slider-min-bound" aria-hidden="true">1k</span>
               <input 
-                id="toggle-ev-charging" 
-                type="checkbox" 
-                class="switch-checkbox" 
-                role="switch" 
-                aria-checked="false"
+                id="input-radius-slider" 
+                type="range" 
+                min="1.0" 
+                max="3.0" 
+                step="0.1" 
+                value="1.5" 
+                class="material-slider"
+                aria-labelledby="radius-slider-label"
+                aria-valuemin="1.0"
+                aria-valuemax="3.0"
+                aria-valuenow="1.5"
+                aria-valuetext="1.5 kilometers search radius"
               >
-              <span class="switch-slider" aria-hidden="true"></span>
+              <span class="slider-max-bound" aria-hidden="true">3k</span>
             </div>
-          </label>
-        </div>
+          </div>
 
+          <!-- Compact Divider -->
+          <div class="controls-vertical-divider" aria-hidden="true"></div>
+
+          <!-- Compact EV Charging Switch -->
+          <div id="ev-filter-group" class="control-group toggle-group">
+            <label for="toggle-ev-charging" class="switch-label-wrapper">
+              <span class="toggle-icon-wrap" aria-hidden="true">
+                <span class="material-symbols-outlined ev-icon">bolt</span>
+              </span>
+              <span class="switch-main-text">EV Only</span>
+              <div class="material-switch">
+                <input 
+                  id="toggle-ev-charging" 
+                  type="checkbox" 
+                  class="switch-checkbox" 
+                  role="switch" 
+                  aria-checked="false"
+                >
+                <span class="switch-slider" aria-hidden="true"></span>
+              </div>
+            </label>
+          </div>
+
+        </div>
       </div>
     </section>
 

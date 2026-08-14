@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/api/insight",
+      "destination": "/api/insight.js"
+    },
+    {
+      "source": "/api/health",
+      "destination": "/api/health.js"
+    }
+  ]
+}

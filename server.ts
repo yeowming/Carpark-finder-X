@@ -6,8 +6,10 @@
  */
 import express from 'express';
 import path from 'path';
+import fs from 'fs';
 import dotenv from 'dotenv';
 import insightHandler from './api/insight.js';
+import healthHandler from './api/health.js';
 
 dotenv.config();
 
@@ -19,8 +21,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Health check route
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+app.all('/api/health', (req, res) => {
+  healthHandler(req, res);
 });
 
 // API Routes for Carpark Insight & Availability
@@ -34,14 +36,29 @@ app.all('/api/insight.js', (req, res) => {
 
 // Serve static assets directly from root and dist
 const staticRoot = process.cwd();
+const distRoot = path.join(staticRoot, 'dist');
+
 app.use(express.static(staticRoot, {
+  extensions: ['html', 'htm'],
+  index: 'index.html'
+}));
+
+app.use(express.static(distRoot, {
   extensions: ['html', 'htm'],
   index: 'index.html'
 }));
 
 // Fallback to index.html for SPA routing
 app.get('*', (req, res) => {
-  res.sendFile(path.join(staticRoot, 'index.html'));
+  const rootIndex = path.join(staticRoot, 'index.html');
+  const distIndex = path.join(distRoot, 'index.html');
+  if (fs.existsSync(rootIndex)) {
+    res.sendFile(rootIndex);
+  } else if (fs.existsSync(distIndex)) {
+    res.sendFile(distIndex);
+  } else {
+    res.status(404).send('Not Found');
+  }
 });
 
 app.listen(PORT, '0.0.0.0', () => {

@@ -64,26 +64,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
 /**
  * Initializes the Leaflet map viewport centered on Singapore.
- * Uses high-performance OpenStreetMap tiles with Singapore boundaries.
+ * Uses official OneMap Singapore Land Authority (SLA) base map tiles.
  */
 function initInteractiveMap() {
-  // Default coordinates: Singapore Central Area
+  // Default coordinates: Singapore Central Area (Raffles Place)
   const initialCoordinates = [appState.currentLat, appState.currentLng];
 
-  // Instantiate Leaflet map on the #map-container DOM element
+  // Instantiate Leaflet map on the #map-container DOM element with Singapore bounds
+  const singaporeBounds = L.latLngBounds(
+    [1.1304753, 103.602084],
+    [1.4784001, 104.094504]
+  );
+
   leafletMap = L.map("map-container", {
     center: initialCoordinates,
     zoom: 15,
+    minZoom: 11,
+    maxZoom: 19,
+    maxBounds: singaporeBounds,
+    maxBoundsViscosity: 0.8,
     zoomControl: false // Reposition zoom controls for clean mobile layout
   });
 
   // Add zoom control to top-left
   L.control.zoom({ position: "topleft" }).addTo(leafletMap);
 
-  // Load standard OpenStreetMap raster tiles
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  // Load official Singapore OneMap SLA raster tiles
+  L.tileLayer("https://www.onemap.gov.sg/maps/tiles/Default/{z}/{x}/{y}.png", {
+    minZoom: 11,
     maxZoom: 19,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | Data: LTA DataMall'
+    bounds: singaporeBounds,
+    attribution: 'Map &copy; <a href="https://www.onemap.gov.sg/" target="_blank" rel="noopener noreferrer">OneMap</a> &copy; Singapore Land Authority | Data: LTA DataMall'
   }).addTo(leafletMap);
 
   // Initialize marker layer groups
@@ -94,6 +105,51 @@ function initInteractiveMap() {
 
   // Draw radius boundary circle on map (1.5km initial)
   updateRadiusCircle(appState.currentLat, appState.currentLng, appState.searchRadiusKm);
+
+  // Allow user to click anywhere on OneMap to inspect carparks around that point
+  leafletMap.on("click", (e) => {
+    const { lat, lng } = e.latlng;
+    handleMapClickLocation(lat, lng);
+  });
+}
+
+/**
+ * Handles map click event by reverse geocoding via OneMap and updating search center.
+ * @param {number} lat 
+ * @param {number} lng 
+ */
+async function handleMapClickLocation(lat, lng) {
+  appState.currentLat = lat;
+  appState.currentLng = lng;
+  appState.currentLocationName = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+
+  updateUserLocationMarker(lat, lng);
+  updateRadiusCircle(lat, lng, appState.searchRadiusKm);
+
+  // Deselect active quick chips
+  const chipButtons = document.querySelectorAll(".chip-button");
+  chipButtons.forEach(c => c.classList.remove("active"));
+
+  // Attempt OneMap reverse geocode
+  try {
+    const revUrl = `https://www.onemap.gov.sg/api/public/revgeocode?location=${lat},${lng}&buffer=40&addressType=All`;
+    const res = await fetch(revUrl);
+    if (res.ok) {
+      const revData = await res.json();
+      if (revData && revData.GeocodeInfo && revData.GeocodeInfo.length > 0) {
+        const info = revData.GeocodeInfo[0];
+        const addr = [info.BUILDINGNAME, info.ROAD, info.POSTALCODE].filter(Boolean).join(", ");
+        if (addr) {
+          appState.currentLocationName = addr;
+        }
+      }
+    }
+  } catch (e) {
+    console.debug("OneMap reverse geocoding skipped:", e);
+  }
+
+  announceAccessibilityMessage(`Selected location on OneMap: ${appState.currentLocationName}. Fetching carparks.`);
+  fetchNearbyCarparks();
 }
 
 /**
@@ -490,9 +546,10 @@ function openCarparkModal(cp) {
     evEl.textContent = "No EV chargers listed";
   }
 
-  // Google Maps navigation direction link
-  const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${cp.latitude},${cp.longitude}`;
+  // OneMap navigation driving route link
+  const directionsUrl = `https://www.onemap.gov.sg/main/v2/route?start=${appState.currentLat},${appState.currentLng}&end=${cp.latitude},${cp.longitude}&routeType=drive`;
   navBtn.setAttribute("href", directionsUrl);
+  navBtn.setAttribute("title", "Open directions on OneMap");
 
   modal.classList.remove("is-hidden");
   announceAccessibilityMessage(`Details opened for ${cp.development}. ${cp.availableLots} lots available.`);
